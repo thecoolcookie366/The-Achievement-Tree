@@ -1,0 +1,84 @@
+let modInfo = {
+	name: "The Achievement Tree",
+	author: "thecoolcookie366",
+	pointsName: "currencies",
+	modFiles: ["layers.js", "tree.js"],
+
+	discordName: "Cookie's Creations Server",
+	discordLink: "https://discord.gg/aUbDYX5Z3a",
+	initialStartPoints: new Decimal (0), // Used for hard resets and new players
+	offlineLimit: 296280,  // In hours
+}
+
+// Set your version in num and name
+let VERSION = {
+	num: "1.00",
+	name: "The [a.] Update",
+}
+
+let changelog = `<h1>Changelog:</h1><br>
+	<br>
+	<h3>Changelog Guide: vA.BC </h3><br>
+	A = big update <br>
+	B = medium update <br>
+	C = small update <br>
+	<br>
+	<h1>v1.00</h1><br>
+		- Woohoo! New game! Have fun.<br>
+		<br>`
+
+let winText = `<i>But this spacetime isn't real, right?</i>`
+
+// If you add new functions anywhere inside of a layer, and those functions have an effect when called, add them here.
+// (The ones here are examples, all official functions are already taken care of)
+var doNotCallTheseFunctionsEveryTick = ["blowUpEverything"]
+
+function getStartPoints(){
+    return new Decimal(modInfo.initialStartPoints)
+}
+
+// Determines if it should show points/sec
+function canGenPoints(){
+	return true
+}
+
+// Calculate points/sec!
+function getPointGen() {
+	if(!canGenPoints())
+		return new Decimal(0)
+
+	let gain = new Decimal(1)
+	return gain
+}
+
+// You can add non-layer related variables that should to into "player" and be saved here, along with default values
+function addedPlayerData() { return {
+}}
+
+// Display extra things at the top of the page
+var displayThings = [
+]
+
+// Determines when the game "ends"
+function isEndgame() {
+	return player.points.gte(new Decimal("12e1e1e1e13247132"))
+}
+
+
+
+// Less important things beyond this point!
+
+// Style for the background, can be a function
+var backgroundStyle = {
+
+}
+
+// You can change this if you have things that can be messed up by long tick lengths
+function maxTickLength() {
+	return(3600) // Default is 1 hour which is just arbitrarily large
+}
+
+// Use this if you need to undo inflation from an older version. If the version is older than the version that fixed the issue,
+// you can cap their current resources with this.
+function fixOldSave(oldVersion){
+}
