@@ -31,7 +31,7 @@ addLayer("p", {
     upgrades: {
         11: {
             title: "Beat the game.",
-            description: "This is the end.",
+            description: "This is the end of the game!",
             cost: new Decimal(1),
         },
     },
