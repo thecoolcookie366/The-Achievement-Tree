@@ -270,13 +270,42 @@ function exportSave() {
 	el.setSelectionRange(0, 99999);
 	document.execCommand("copy");
 	document.body.removeChild(el);
+
+	if (player && player.p && player.p.completedAchievements) {
+		if (!player.p.completedAchievements.includes("bakup")) {
+			player.p.completedAchievements.push("bakup");
+			save();
+			window.location.reload();
+		}
+	}
 }
 function importSave(imported = undefined, forced = false) {
 	if (imported === undefined)
-		imported = prompt("Paste your save here");
+		imported = prompt("Import your save here");
+	
+	if (imported) {
+		let cleanImport = imported.trim();
+		
+		if (cleanImport === "your save here") {
+			if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("ins")) {
+				player.p.completedAchievements.push("ins");
+				save();
+			}
+			return;
+		}
+		
+		if (cleanImport === "42") {
+			if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("42")) {
+				player.p.completedAchievements.push("42");
+				save();
+			}
+			return;
+		}
+	}
+
 	try {
 		tempPlr = Object.assign(getStartPlayer(), JSON.parse(atob(imported)));
-		if (tempPlr.versionType != getModID() && !forced && !confirm("This save appears to be for a different mod! Are you sure you want to import?")) // Wrong save (use "Forced" to force it to accept.)
+		if (tempPlr.versionType != getModID() && !forced && !confirm("This save appears to be from a game that doesn't have an INSANE number of achievements, are you sure you want to import this still?")) // Wrong save (use "Forced" to force it to accept.)
 			return;
 		player = tempPlr;
 		player.versionType = getModID();

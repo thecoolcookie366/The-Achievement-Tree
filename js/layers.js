@@ -7,6 +7,7 @@ addLayer("p", {
         points: new Decimal(0),
         completedAchievements: []
     }},
+    tooltip: "Achievements [Protons]",
     nodeStyle: {
         background: "linear-gradient(#00d2ff, #00458e, #0d011a)",
         backgroundOrigin: "border-box",
@@ -35,53 +36,156 @@ addLayer("p", {
         let activeLayer = this.layer
         let list = layers[activeLayer].customAchievements
         if (!list) return
+
+        if (!window.hasRightClickContainerSetup) {
+            window.hasRightClickContainerSetup = true
+            window.addEventListener('contextmenu', function () {
+                if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("rclik")) {
+                    player.p.completedAchievements.push("rclik")
+                }
+            })
+            window.addEventListener('click', function (e) {
+                let halfWidth = window.innerWidth / 2
+                if (e.clientX > halfWidth) {
+                    if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("rclik")) {
+                        player.p.completedAchievements.push("rclik")
+                    }
+                }
+            })
+        }
+
         Object.keys(list).forEach(key => {
             let ac = list[key]
             if (player[activeLayer].completedAchievements && !player[activeLayer].completedAchievements.includes(ac.id)) {
-                if (typeof ac.done === "function" && ac.done()) {
-                    player[activeLayer].completedAchievements.push(ac.id)
+                if (ac.isClickAch) return
+                if (ac.isRNG) {
+                    let canRoll = true
+                    if (ac.reqId && !player[activeLayer].completedAchievements.includes(ac.reqId)) {
+                        canRoll = false
+                    }
+                    if (canRoll && Math.random() < (1 / ac.chancePerSec) * diff) {
+                        player[activeLayer].completedAchievements.push(ac.id)
+                    }
+                } else {
+                    if (typeof ac.done === "function" && ac.done()) {
+                        player[activeLayer].completedAchievements.push(ac.id)
+                    }
                 }
             }
         })
     },
     customAchievements: {
-        11: {
+        1: {
             name: "A start.",
             desc: "There is a 100% chance you get this. Yay!",
             rarity: 1,
-            color: "#686868",
+            color: "#4f4f4f",
             icon: "●",
             id: "start",
             done() { return true }
         },
-        21: {
+        2: {
             name: "An achievement!",
             desc: "Get at least one achievement.",
             rarity: 2,
-            color: "#bcbcbc",
+            color: "#858585",
             icon: "◎",
             id: "ach01",
             done() { return player.p.completedAchievements.length >= 1 }
         },
-        31: {
-            name: " ",
-            desc: " ",
-            rarity: 1000,
+        3: {
+            name: "Lucky",
+            desc: "A 1/10 chance to get this per second.",
+            rarity: 20,
+            color: "#858585",
+            icon: "◎",
+            id: "rng1",
+            isRNG: true,
+            chancePerSec: 10
+        },
+        4: {
+            name: "Quite lucky",
+            desc: "A 1/50 chance to get this per second when you have 'Lucky' unlocked.",
+            rarity: 80,
+            color: "#858585",
+            icon: "◎",
+            id: "rng2",
+            isRNG: true,
+            chancePerSec: 50,
+            reqId: "rng1"
+        },
+        5: {
+            name: "Very lucky",
+            desc: "1/250 chance to get this per second when you have 'Quite lucky' unlocked.",
+            rarity: 320,
+            color: "#858585",
+            icon: "◎",
+            id: "rng3",
+            isRNG: true,
+            chancePerSec: 250,
+            reqId: "rng2"
+        },
+        6: {
+            name: "Remember to keep a backup",
+            desc: "Export your save.",
+            rarity: 4,
+            rewardDesc: "Unlock an input box.",
+            color: "#858585",
+            icon: "◎",
+            id: "bakup",
+        },
+        7: {
+            name: "Follow instructions",
+            desc: "Do what the man said.",
+            rarity: 308,
+            color: "#858585",
+            icon: "◎",
+            id: "ins",
+        },
+        8: {
+            name: "Made the Right Click/Tap",
+            desc: "Tap on the right side of the screen or right click.",
+            rarity: 3,
+            color: "#858585",
+            icon: "◎",
+            id: "rclik",
+        },
+        9: {
+            name: "Achievement Unlocked 4",
+            desc: 'Type "elephant" in the input.',
+            rarity: 8,
+            color: "#858585",
+            icon: "◎",
+            id: "achun",
+        },
+        10: {
+            name: "Morse",
+            desc: 'Type ".- -.-. .... .. . ...- . -- . -. - ..." somewhere.',
+            rarity: 222,
+            color: "#858585",
+            icon: "◎",
+            id: "ms4ac",
+        },
+        11: {
+            name: "Insanely lucky",
+            desc: "1/5000 chance to get this per second when you have 'Very lucky' unlocked.",
+            rarity: 2560,
             color: "#e33b3b",
             icon: "■",
-            id: " ",
-            done() { return player.p.points.gte(1) }
+            id: "rng4",
+            isRNG: true,
+            chancePerSec: 5000,
+            reqId: "rng3"
         },
-        41: {
-            name: " ",
-            desc: " ",
-            rarity: 10000,
+        12: {
+            name: "What the!",
+            desc: "Don't act like you don't know what you inputted... Hint: Add the digits of the value, multiply by 3 and add 4, then input that.",
+            rarity: 14916,
             color: "#cf7a1d",
             icon: "⬠",
-            id: " ",
-            done() { return player.points.gte(100) }
+            id: "what",
         },
-        51: {
+        13: {
             name: " ",
             desc: " ",
             rarity: 30000,
@@ -90,7 +194,7 @@ addLayer("p", {
             id: " ",
             done() { return player.p.points.gte(10) }
         },
-        61: {
+        14: {
             name: " ",
             desc: " ",
             rarity: 90000,
@@ -99,7 +203,7 @@ addLayer("p", {
             id: " ",
             done() { return player.points.gte(10000) }
         },
-        71: {
+        15: {
             name: " ",
             desc: " ",
             rarity: 500000,
@@ -108,7 +212,7 @@ addLayer("p", {
             id: " ",
             done() { return player.p.points.gte(100) }
         },
-        81: {
+        16: {
             name: " ",
             desc: " ",
             rarity: 1000000,
@@ -117,7 +221,7 @@ addLayer("p", {
             id: " ",
             done() { return player.points.gte(1e6) }
         },
-        91: {
+        17: {
             name: " ",
             desc: " ",
             rarity: 7500000,
@@ -126,7 +230,7 @@ addLayer("p", {
             id: " ",
             done() { return player.p.points.gte(1000) }
         },
-        101: {
+        18: {
             name: " ",
             desc: " ",
             rarity: 15000000,
@@ -135,16 +239,16 @@ addLayer("p", {
             id: " ",
             done() { return player.points.gte(1e9) }
         },
-        111: {
+        19: {
             name: " ",
             desc: " ",
             rarity: 50000000,
-            color: "#a1ab16",
+            color: "#c8d424",
             icon: "✴",
             id: " ",
             done() { return player.p.points.gte(10000) }
         },
-        121: {
+        20: {
             name: " ",
             desc: " ",
             rarity: 100000000,
@@ -153,7 +257,7 @@ addLayer("p", {
             id: " ",
             done() { return player.points.gte(1e12) }
         },
-        131: {
+        21: {
             name: " ",
             desc: " ",
             rarity: 400000000,
@@ -162,7 +266,7 @@ addLayer("p", {
             id: " ",
             done() { return player.p.points.gte(1e5) }
         },
-        141: {
+        22: {
             name: " ",
             desc: " ",
             rarity: 800000000,
@@ -171,7 +275,7 @@ addLayer("p", {
             id: " ",
             done() { return player.points.gte(1e15) }
         },
-        151: {
+        23: {
             name: " ",
             desc: " ",
             rarity: 5000000000,
@@ -180,16 +284,16 @@ addLayer("p", {
             id: " ",
             done() { return player.p.points.gte(1e6) }
         },
-        161: {
+        24: {
             name: " ",
             desc: " ",
             rarity: 40000000000,
-            color: "#9c1111",
-            icon: "🕸",
+            color: "#620f0f",
+            icon: "▲",
             id: " ",
             done() { return false }
         },
-        171: {
+        25: {
             name: " ",
             desc: " ",
             rarity: 200000000000,
@@ -198,16 +302,52 @@ addLayer("p", {
             id: " ",
             done() { return false }
         },
-        181: {
+        26: {
             name: "The end.",
-            desc: "Obtain every other achievement. The fun is over, go find something to do now.",
-            rewardDesc: "Unlock Bonus Achievements.",
-            rarity: 0,
+            desc: "Obtain every other achievement.",
+            rewardDesc: "Unlock Loops on the main tree. (soon)",
+            rarity: Infinity,
             color: "#360540",
             icon: "✹",
             id: "thend",
             done() { return false }
-        }
+        },
+        27: {
+            name: "The start...?",
+            desc: "Have exactly -1 achievements at once. Wait, what?",
+            rewardDesc: "Unlock the Input Box++. (soon)",
+            rarity: 0,
+            color: "#360540",
+            icon: "✹",
+            id: "thart",
+            done() { return false }
+        },
+        28: {
+            name: "Hippopotomonstrosesquippedaliophobia",
+            desc: "Type the longest word (pneumonoultramicroscopicsilicovolcanoconiosis) in the input.",
+            rarity: 1050,
+            color: "#e33b3b",
+            icon: "■",
+            id: "longw",
+        },
+        29: {
+            name: "The True Beginning",
+            desc: "Get at least 10 achievements.",
+            rewardDesc: "Unlock a new layer.",
+            rarity: 1001,
+            color: "#e33b3b",
+            icon: "■",
+            id: "begin",
+            done() { return player.p.completedAchievements.length >= 10 }
+        },
+        30: {
+            name: "42",
+            desc: "Import the meaning of life.",
+            rarity: 42,
+            color: "#858585",
+            icon: "◎",
+            id: "42",
+        },
     },
     tabFormat: [
         ["raw-html", function() {
@@ -215,13 +355,15 @@ addLayer("p", {
             let targetLayerObj = layers.p
             if (!targetLayerObj || !targetLayerObj.customAchievements) return ""
             let sortedAchievements = Object.values(targetLayerObj.customAchievements).sort((a, b) => {
-                if (a.rarity === 0) return 1
-                if (b.rarity === 0) return -1
-                return a.rarity - b.rarity
+                let aVal = a.rarity === Infinity ? 9e20 : a.rarity
+                let bVal = b.rarity === Infinity ? 9e20 : b.rarity
+                if (aVal === 0) return 1
+                if (bVal === 0) return -1
+                return aVal - bVal
             })
             sortedAchievements.forEach(ac => {
                 let isObtained = player.p.completedAchievements ? player.p.completedAchievements.includes(ac.id) : false
-                let chanceText = ac.rarity === 0 ? "Value: ∞<sup>*</sup>" : `Value: ${ac.rarity.toLocaleString()}`
+                let chanceText = (ac.rarity === 0 || ac.rarity === Infinity) ? "Value: ∅" : `Value: ${ac.rarity.toLocaleString()}`
                 let statusText = isObtained ? "unlocked!" : "locked"
                 let opacity = isObtained ? "1.0" : "0.25"
                 
@@ -238,9 +380,12 @@ addLayer("p", {
                 }
 
                 let rewardText = ac.rewardDesc ? `<div style="font-size: 11px; color: #e6c229; margin-top: 2px; font-weight: bold;">Reward: ${ac.rewardDesc}</div>` : ""
+                let acKey = Object.keys(targetLayerObj.customAchievements).find(k => targetLayerObj.customAchievements[k].id === ac.id) || ac.id
+                let clickAction = ac.isClickAch ? `onclick="layers.p.customAchievements[${acKey}].click()"` : ""
+                let glowStyle = ac.isClickAch ? `onmouseenter="this.style.boxShadow='0 0 12px ${ac.color || '#fff'}', inset 0 0 10px rgba(0,0,0,0.6)'; this.style.filter='brightness(1.15)'" onmouseleave="this.style.boxShadow='inset 0 0 10px rgba(0,0,0,0.6)'; this.style.filter='none'"` : ""
 
                 htmlStr += `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: #161616; border: 2px solid ${ac.color || '#fff'}; border-radius: 6px; padding: 8px 12px; color: ${ac.color || '#fff'}; opacity: ${opacity}; box-shadow: inset 0 0 10px rgba(0,0,0,0.6);">
+                <div ${glowStyle} ${clickAction} style="display: flex; align-items: center; justify-content: space-between; background: #161616; border: 2px solid ${ac.color || '#fff'}; border-radius: 6px; padding: 8px 12px; color: ${ac.color || '#fff'}; opacity: ${opacity}; box-shadow: inset 0 0 10px rgba(0,0,0,0.6); transition: all 0.2s ease; cursor: ${ac.isClickAch ? 'pointer' : 'default'};">
                     <div style="display: flex; align-items: center; gap: 14px;">
                         ${renderIcon}
                         <div>
@@ -258,6 +403,78 @@ addLayer("p", {
                 </div>`
             })
             htmlStr += `</div>`
+            return htmlStr
+        }]
+    ],
+})
+
+addLayer("i", {
+    name: "input",
+    symbol: "I",
+    position: 0,
+    startData() { return {
+        unlocked: true,
+        points: new Decimal(0),
+        inputText: ""
+    }},
+    tooltip: "Input Box",
+    color: "#e6c229",
+    row: 'side',
+    resource: "output boxes",
+    type: "none",
+    layerShown() { 
+        return player.p.completedAchievements.includes("bakup")
+    },
+    tabFormat: [
+        ["raw-html", function() {
+            let activeLayer = this.layer
+            let htmlStr = `
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin: 20px auto; max-width: 400px; font-family: monospace;">
+                <input 
+                    id="text-input-field"
+                    type="text" 
+                    placeholder="Whenever you're ready!" 
+                    style="width: 100%; padding: 10px; background: #161616; border: 2px solid #e6c229; border-radius: 6px; color: #fff; font-family: monospace; font-size: 14px; text-align: center; box-shadow: inset 0 0 8px rgba(0,0,0,0.8);"
+                />
+                <button 
+                    onclick="
+                        let val = document.getElementById('text-input-field').value;
+                        player['${activeLayer}'].inputText = val;
+                        let cleanVal = val.trim().toLowerCase();
+                        
+                        if (cleanVal === 'elephant') {
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('achun')) {
+                                player.p.completedAchievements.push('achun');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanVal === '.- -.-. .... .. . ...- . -- . -. - ...') {
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('ms4ac')) {
+                                player.p.completedAchievements.push('ms4ac');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanVal === 'pneumonoultramicroscopicsilicovolcanoconiosis') {
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('longw')) {
+                                player.p.completedAchievements.push('longw');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanVal === '67') {
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('what')) {
+                                player.p.completedAchievements.push('what');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        }
+                    "
+                    onmouseenter="this.style.backgroundColor='#e6c229'; this.style.color='#161616';"
+                    onmouseleave="this.style.backgroundColor='transparent'; this.style.color='#e6c229';"
+                    style="padding: 8px 16px; background: transparent; border: 2px solid #e6c229; border-radius: 6px; color: #e6c229; font-family: monospace; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;"
+                >
+                    confirm
+                </button>
+            </div>`
             return htmlStr
         }]
     ]
