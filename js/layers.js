@@ -348,6 +348,14 @@ addLayer("p", {
             icon: "◎",
             id: "42",
         },
+        31: {
+            name: "Nostalgia",
+            desc: 'You feel like playing it again. Import a save from the oldest game by [name]366.',
+            rarity: 366,
+            color: "#858585",
+            icon: "◎",
+            id: "old",
+        },
     },
     tabFormat: [
         ["raw-html", function() {

@@ -301,6 +301,17 @@ function importSave(imported = undefined, forced = false) {
 			}
 			return;
 		}
+
+		try {
+			let decodedStr = atob(cleanImport);
+			if (decodedStr.includes('"versionType":"The-Cookie-Tree-thecoolcookie366"')) {
+				if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("old")) {
+					player.p.completedAchievements.push("old");
+					save();
+				}
+				return;
+			}
+		} catch (e) {}
 	}
 
 	try {
