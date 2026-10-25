@@ -329,6 +329,46 @@ function importSave(imported = undefined, forced = false) {
 		return;
 	}
 }
+function exportSaveToFile() {
+	let str = btoa(JSON.stringify(player));
+	let blob = new Blob([str], { type: "text/plain;charset=utf-8" });
+	let a = document.createElement("a");
+	a.href = URL.createObjectURL(blob);
+	a.download = (typeof modInfo !== 'undefined' ? modInfo.name : "tmt") + "_" + player.p.completedAchievements.length + "_Achievements.txt";
+	document.body.appendChild(a);
+	a.click();
+	document.body.removeChild(a);
+}
+function importSaveFromFile() {
+	let input = document.createElement("input");
+	input.type = "file";
+	input.accept = ".txt";
+	input.onchange = e => {
+		let file = e.target.files[0]; 
+		if (!file) return;
+		
+		let reader = new FileReader();
+		reader.onload = readerEvent => {
+			let content = readerEvent.target.result.trim();
+			if (content) {
+				try {
+					let decodedStr = atob(content);
+					if (decodedStr.includes('"versionType":"The-Cookie-Tree-thecoolcookie366"')) {
+						if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("old")) {
+							player.p.completedAchievements.push("old");
+							save();
+						}
+						return;
+					}
+				} catch (e) {}
+
+				importSave(content);
+			}
+		};
+		reader.readAsText(file); 
+	};
+	input.click();
+}
 function versionCheck() {
 	let setVersion = true;
 
