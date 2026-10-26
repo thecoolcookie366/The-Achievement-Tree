@@ -7,7 +7,9 @@ addLayer("p", {
         points: new Decimal(0),
         completedAchievements: []
     }},
-    tooltip: "Achievements [Protons]",
+    tooltip() {
+        return "Protons<br> " + player.p.completedAchievements.length + " Achievements"
+    },
     nodeStyle: {
         background: "linear-gradient(#00d2ff, #00458e, #0d011a)",
         backgroundOrigin: "border-box",
@@ -15,7 +17,7 @@ addLayer("p", {
         color: "rgb(255, 255, 255)"
     },
     color: "#00ffcc",
-    requires: new Decimal(1),
+    requires: new Decimal("(e^1.796e308)2"),
     resource: "protons",
     baseResource: "currencies",
     baseAmount() {return player.points},
@@ -69,6 +71,10 @@ addLayer("p", {
                 } else {
                     if (typeof ac.done === "function" && ac.done()) {
                         player[activeLayer].completedAchievements.push(ac.id)
+                        if (ac.id === "begin") {
+                            save()
+                            window.location.reload()
+                        }
                     }
                 }
             }
@@ -356,6 +362,14 @@ addLayer("p", {
             icon: "◎",
             id: "old",
         },
+        32: {
+            name: "Overload",
+            desc: "Input overload. No, not literally!",
+            rarity: 1200,
+            color: "#e33b3b",
+            icon: "■",
+            id: "int",
+        },
     },
     tabFormat: [
         ["raw-html", function() {
@@ -448,21 +462,28 @@ addLayer("i", {
                     onclick="
                         let val = document.getElementById('text-input-field').value;
                         player['${activeLayer}'].inputText = val;
-                        let cleanVal = val.trim().toLowerCase();
+                        let cleanVal = val.trim();
+                        let cleanValLower = cleanVal.toLowerCase();
                         
-                        if (cleanVal === 'elephant') {
+                        if (cleanVal.length >= 512) {
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('int')) {
+                                player.p.completedAchievements.push('int');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanValLower === 'elephant') {
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('achun')) {
                                 player.p.completedAchievements.push('achun');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
-                        } else if (cleanVal === '.- -.-. .... .. . ...- . -- . -. - ...') {
+                        } else if (cleanValLower === '.- -.-. .... .. . ...- . -- . -. - ...') {
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('ms4ac')) {
                                 player.p.completedAchievements.push('ms4ac');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
-                        } else if (cleanVal === 'pneumonoultramicroscopicsilicovolcanoconiosis') {
+                        } else if (cleanValLower === 'pneumonoultramicroscopicsilicovolcanoconiosis') {
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('longw')) {
                                 player.p.completedAchievements.push('longw');
                                 player['${activeLayer}'].inputText = '';
@@ -485,5 +506,102 @@ addLayer("i", {
             </div>`
             return htmlStr
         }]
+    ]
+})
+
+addLayer("s", {
+    name: "start",
+    symbol: "S",
+    position: 1,
+    startData() { return {
+        unlocked: true,
+        points: new Decimal(0),
+    }},
+    tooltip: "Start",
+    nodeStyle: {
+        background: "linear-gradient(#e33b3b, #8a13a3, #0d011a)",
+        backgroundOrigin: "border-box",
+        borderColor: "rgba(227, 59, 59, 0.4)",
+        color: "rgb(255, 255, 255)"
+    },
+    color: "#e33b3b",
+    requires: new Decimal(1),
+    resource: "starts",
+    baseResource: "protons",
+    baseAmount() { return player.points },
+    type: "normal",
+    exponent: 0.222,
+    row: 1,
+    layerShown() { 
+        return player.p.completedAchievements.includes("begin")
+    },
+    gainMult() {
+        let mult = new Decimal(1)
+        return mult
+    },
+    gainExp() {
+        let exp = new Decimal(1)
+        return exp
+    },
+    passiveGeneration() {
+        let Gen = 0
+        if (hasUpgrade('s', 13)) Gen = 1
+        return Gen
+    },
+    upgrades: {
+        11: {
+            title: "Begin.",
+            description: "Start getting 0.2 glass/s. ",
+            cost: new Decimal(0),
+        },
+        12: {
+            title: "Is this the world's most generic upgrade?",
+            description: "x2 glass/s.",
+            cost: new Decimal(3),
+        },
+        13: {
+            title: "This is getting boring.",
+            description: "x2.5 glass/s, and automatically generate starts.",
+            cost: new Decimal(10),
+        },
+        14: {
+            title: "Achievements! I love achievements!",
+            description: "Get a free achievement when you buy this!",
+            cost: new Decimal(50e50),
+            onPurchase() {
+                if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("stach")) {
+                    player.p.completedAchievements.push("stach")
+                }
+            }
+        },
+        21: {
+            title: "",
+            description: "",
+            cost: new Decimal(50e50),
+        },
+        22: {
+            title: "",
+            description: "",
+            cost: new Decimal(50e50),
+        },
+        23: {
+            title: "",
+            description: "",
+            cost: new Decimal(50e50),
+        },
+        24: {
+            title: "",
+            description: "",
+            cost: new Decimal(50e50),
+        },
+    },
+    tabFormat: [
+        "main-display",
+        function() {
+            if (hasUpgrade(this.layer, 13)) return ""
+            return "prestige-button"
+        },
+        "blank",
+        "upgrades"
     ]
 })

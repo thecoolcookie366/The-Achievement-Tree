@@ -1,7 +1,7 @@
 let modInfo = {
 	name: "The Achievement Tree",
 	author: "thecoolcookie366",
-	pointsName: "currencies",
+	pointsName: "glass",
 	modFiles: ["layers.js", "tree.js"],
 
 	discordName: "Cookie's Creations Server",
@@ -48,6 +48,9 @@ function getPointGen() {
 		return new Decimal(0)
 
 	let gain = new Decimal(0)
+	if (hasUpgrade('s',11)) gain = new Decimal(0.2)
+	if (hasUpgrade('s',12)) gain = gain.mul(2)
+	if (hasUpgrade('s',13)) gain = gain.mul(2.5)
 	return gain
 }
 
