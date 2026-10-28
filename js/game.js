@@ -391,12 +391,19 @@ function gameLoop(diff) {
 }
 
 function hardReset(resetOptions) {
-	if (!confirm("Are you sure you want to do this? You will lose all your progress!")) return
-	player = null
-	if(resetOptions) options = null
+	if (!confirm("Are you sure you want to do this? You will lose all your progress!")) {
+		if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("woah")) {
+			player.p.completedAchievements.push("woah");
+			save();
+		}
+		return;
+	}
+	player = null;
+	if(resetOptions) options = null;
 	save(true);
 	window.location.reload();
 }
+
 
 var ticking = false
 

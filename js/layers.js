@@ -198,7 +198,6 @@ addLayer("p", {
             color: "#8a13a3",
             icon: "⬢",
             id: " ",
-            done() { return player.p.points.gte(10) }
         },
         14: {
             name: " ",
@@ -207,7 +206,6 @@ addLayer("p", {
             color: "#14a377",
             icon: "◉",
             id: " ",
-            done() { return player.points.gte(10000) }
         },
         15: {
             name: " ",
@@ -216,7 +214,6 @@ addLayer("p", {
             color: "#c91ca3",
             icon: "❖",
             id: " ",
-            done() { return player.p.points.gte(100) }
         },
         16: {
             name: " ",
@@ -225,7 +222,6 @@ addLayer("p", {
             color: "#a89519",
             icon: "✦",
             id: " ",
-            done() { return player.points.gte(1e6) }
         },
         17: {
             name: " ",
@@ -234,7 +230,6 @@ addLayer("p", {
             color: "#54ab16",
             icon: "★",
             id: " ",
-            done() { return player.p.points.gte(1000) }
         },
         18: {
             name: " ",
@@ -243,7 +238,6 @@ addLayer("p", {
             color: "#1669ab",
             icon: "✪",
             id: " ",
-            done() { return player.points.gte(1e9) }
         },
         19: {
             name: " ",
@@ -252,7 +246,6 @@ addLayer("p", {
             color: "#c8d424",
             icon: "✴",
             id: " ",
-            done() { return player.p.points.gte(10000) }
         },
         20: {
             name: " ",
@@ -261,7 +254,6 @@ addLayer("p", {
             color: "#103c82",
             icon: "✵",
             id: " ",
-            done() { return player.points.gte(1e12) }
         },
         21: {
             name: " ",
@@ -270,7 +262,6 @@ addLayer("p", {
             color: "#5b378c",
             icon: "❈",
             id: " ",
-            done() { return player.p.points.gte(1e5) }
         },
         22: {
             name: " ",
@@ -279,7 +270,6 @@ addLayer("p", {
             color: "#4f1f4b",
             icon: "✸",
             id: " ",
-            done() { return player.points.gte(1e15) }
         },
         23: {
             name: " ",
@@ -288,7 +278,6 @@ addLayer("p", {
             color: "#437d77",
             is3DCube: true,
             id: " ",
-            done() { return player.p.points.gte(1e6) }
         },
         24: {
             name: " ",
@@ -297,16 +286,14 @@ addLayer("p", {
             color: "#620f0f",
             icon: "▲",
             id: " ",
-            done() { return false }
         },
         25: {
-            name: " ",
-            desc: " ",
-            rarity: 200000000000,
+            name: "Scripter",
+            desc: "What would a scripter do?",
+            rarity: 222222222222,
             color: "#dedede",
             icon: "⚙",
-            id: " ",
-            done() { return false }
+            id: "scipt",
         },
         26: {
             name: "The end.",
@@ -370,6 +357,22 @@ addLayer("p", {
             icon: "■",
             id: "int",
         },
+        33: {
+            name: "No, this does nothing. Wait...",
+            desc: "Repeated attempts does make something work??",
+            rarity: 1500,
+            color: "#e33b3b",
+            icon: "■",
+            id: "try",
+        },
+        34: {
+            name: "Knife's edge",
+            desc: "Be careful.",
+            rarity: 1750,
+            color: "#e33b3b",
+            icon: "■",
+            id: "woah",
+        },
     },
     tabFormat: [
         ["raw-html", function() {
@@ -387,7 +390,7 @@ addLayer("p", {
                 let isObtained = player.p.completedAchievements ? player.p.completedAchievements.includes(ac.id) : false
                 let chanceText = (ac.rarity === 0 || ac.rarity === Infinity) ? "Value: ∅" : `Value: ${ac.rarity.toLocaleString()}`
                 let statusText = isObtained ? "unlocked!" : "locked"
-                let opacity = isObtained ? "1.0" : "0.25"
+                let opacity = isObtained ? "1.5" : "0.5"
                 
                 let renderIcon = `<div style="font-size: 26px; width: 32px; text-align: center;">${ac.icon}</div>`
                 if (ac.is3DCube) {
@@ -411,11 +414,11 @@ addLayer("p", {
                     <div style="display: flex; align-items: center; gap: 14px;">
                         ${renderIcon}
                         <div>
-                            <div style="font-size: 16px; font-weight: bold; text-shadow: 0 0 4px ${ac.color || '#fff'}33;">${ac.name}</div>
-                            <div style="font-size: 12px; color: #aaaaaa; margin-top: 2px;">
+                            <div style="font-size: 16px; font-weight: bold; text-shadow: 0 0 4px ${ac.color || '#fff'};">${ac.name}</div>
+                            <div style="font-size: 12px; color: #fff; margin-top: 2px;">
                                 ${chanceText} • <span style="color: ${isObtained ? '#4ef072' : '#888'}; font-weight: ${isObtained ? 'bold' : 'normal'}">${statusText}</span>
                             </div>
-                            <div style="font-size: 11px; color: #777; margin-top: 1px; font-style: italic;">${ac.desc}</div>
+                            <div style="font-size: 11px; color: #ccc; margin-top: 1px; font-style: italic;">${ac.desc}</div>
                             ${rewardText}
                         </div>
                     </div>
@@ -437,7 +440,8 @@ addLayer("i", {
     startData() { return {
         unlocked: true,
         points: new Decimal(0),
-        inputText: ""
+        inputText: "",
+        failedAttempts: 0
     }},
     tooltip: "Input Box",
     color: "#e6c229",
@@ -464,34 +468,57 @@ addLayer("i", {
                         player['${activeLayer}'].inputText = val;
                         let cleanVal = val.trim();
                         let cleanValLower = cleanVal.toLowerCase();
+                        let matched = false;
                         
                         if (cleanVal.length >= 512) {
+                            matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('int')) {
                                 player.p.completedAchievements.push('int');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
                         } else if (cleanValLower === 'elephant') {
+                            matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('achun')) {
                                 player.p.completedAchievements.push('achun');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
                         } else if (cleanValLower === '.- -.-. .... .. . ...- . -- . -. - ...') {
+                            matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('ms4ac')) {
                                 player.p.completedAchievements.push('ms4ac');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
                         } else if (cleanValLower === 'pneumonoultramicroscopicsilicovolcanoconiosis') {
+                            matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('longw')) {
                                 player.p.completedAchievements.push('longw');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
                         } else if (cleanVal === '67') {
+                            matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('what')) {
                                 player.p.completedAchievements.push('what');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        }
+                        
+                        if (cleanVal !== '') {
+                            if (matched) {
+                                player['${activeLayer}'].failedAttempts = 0;
+                            } else {
+                                if (player['${activeLayer}'].failedAttempts === undefined) player['${activeLayer}'].failedAttempts = 0;
+                                player['${activeLayer}'].failedAttempts++;
+                                if (player['${activeLayer}'].failedAttempts >= 3) {
+                                    if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('try')) {
+                                        player.p.completedAchievements.push('try');
+                                    }
+                                    player['${activeLayer}'].failedAttempts = 0;
+                                }
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
