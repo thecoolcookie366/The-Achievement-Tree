@@ -302,6 +302,14 @@ function importSave(imported = undefined, forced = false) {
 			return;
 		}
 
+		if (cleanImport.toLowerCase() === "f") {
+			if (player && player.p && player.p.completedAchievements && !player.p.completedAchievements.includes("pr")) {
+				player.p.completedAchievements.push("pr");
+				save();
+			}
+			return;
+		}
+
 		try {
 			let decodedStr = atob(cleanImport);
 			if (decodedStr.includes('"versionType":"The-Cookie-Tree-thecoolcookie366"')) {

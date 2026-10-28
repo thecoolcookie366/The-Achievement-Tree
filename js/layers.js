@@ -192,12 +192,15 @@ addLayer("p", {
             id: "what",
         },
         13: {
-            name: " ",
-            desc: " ",
-            rarity: 30000,
+            name: "Ridiculously lucky",
+            desc: "1/111,111 chance to get this per second when you have 'Insanely lucky' unlocked.",
+            rarity: 40960,
             color: "#8a13a3",
             icon: "⬢",
-            id: " ",
+            id: "rng5",
+            isRNG: true,
+            chancePerSec: 111111,
+            reqId: "rng4"
         },
         14: {
             name: " ",
@@ -208,12 +211,15 @@ addLayer("p", {
             id: " ",
         },
         15: {
-            name: " ",
-            desc: " ",
-            rarity: 500000,
+            name: "Impossibly lucky",
+            desc: "1/13,983,816 chance to get this per second when you have 'Ridiculously lucky' unlocked.",
+            rarity: 655360,
             color: "#c91ca3",
             icon: "❖",
-            id: " ",
+            id: "rng6",
+            isRNG: true,
+            chancePerSec: 13983816,
+            reqId: "rng5"
         },
         16: {
             name: " ",
@@ -224,12 +230,15 @@ addLayer("p", {
             id: " ",
         },
         17: {
-            name: " ",
-            desc: " ",
-            rarity: 7500000,
+            name: "You're too lucky...",
+            desc: "1/292,201,338 chance to get this per second when you have 'Impossibly lucky' unlocked.",
+            rarity: 10485760,
             color: "#54ab16",
             icon: "★",
-            id: " ",
+            id: "rng7",
+            isRNG: true,
+            chancePerSec: 292201338,
+            reqId: "rng6"
         },
         18: {
             name: " ",
@@ -373,6 +382,30 @@ addLayer("p", {
             icon: "■",
             id: "woah",
         },
+        35: {
+            name: "Pay respect",
+            desc: "Thank you. (import only)",
+            rarity: 389,
+            color: "#bcbcbc",
+            icon: "◎",
+            id: "pr",
+        },
+        36: {
+            name: "Color the text",
+            desc: "Turn a darker text into a ligher one.",
+            rarity: 2250,
+            color: "#e33b3b",
+            icon: "■",
+            id: "c1",
+        },
+        37: {
+            name: "Going backwards",
+            desc: "Type backwards in the input.",
+            rarity: 444,
+            color: "#bcbcbc",
+            icon: "◎",
+            id: "hca?!",
+        },
     },
     tabFormat: [
         ["raw-html", function() {
@@ -459,7 +492,7 @@ addLayer("i", {
                 <input 
                     id="text-input-field"
                     type="text" 
-                    placeholder="Whenever you're ready!" 
+                    placeholder="Whenever you are ready!" 
                     style="width: 100%; padding: 10px; background: #161616; border: 2px solid #e6c229; border-radius: 6px; color: #fff; font-family: monospace; font-size: 14px; text-align: center; box-shadow: inset 0 0 8px rgba(0,0,0,0.8);"
                 />
                 <button 
@@ -502,6 +535,20 @@ addLayer("i", {
                             matched = true;
                             if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('what')) {
                                 player.p.completedAchievements.push('what');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanVal === 'Whenever you are ready!') {
+                            matched = true;
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('c1')) {
+                                player.p.completedAchievements.push('c1');
+                                player['${activeLayer}'].inputText = '';
+                                document.getElementById('text-input-field').value = '';
+                            }
+                        } else if (cleanValLower === 'tnemeveihca') {
+                            matched = true;
+                            if (player.p && player.p.completedAchievements && !player.p.completedAchievements.includes('hca?!')) {
+                                player.p.completedAchievements.push('hca?!');
                                 player['${activeLayer}'].inputText = '';
                                 document.getElementById('text-input-field').value = '';
                             }
